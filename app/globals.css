@@ -394,8 +394,8 @@ button {
   pointer-events: none;
 }
 
-.demo-room,
-.back-wall,
+.scene-backdrop,
+.scene-objects,
 .window,
 .art,
 .vanity,
@@ -407,13 +407,15 @@ button {
   position: absolute;
 }
 
-.demo-room {
+.scene-backdrop {
   inset: 0;
   z-index: 0;
-  background: linear-gradient(180deg, #eadfce 0 var(--wall-end), #cfc3b4 var(--wall-end) 100%);
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, .36), transparent 44%),
+    linear-gradient(180deg, #eadfce 0 var(--wall-end), #cfc3b4 var(--wall-end) 100%);
 }
 
-.demo-room::before {
+.scene-backdrop::before {
   content: '';
   position: absolute;
   left: 0;
@@ -423,17 +425,22 @@ button {
   background: rgba(76, 67, 55, .35);
 }
 
-.demo-room.bathroom {
-  background: linear-gradient(180deg, #ece9e0 0 68%, #d4c8b7 68% 100%);
+.scene-backdrop.bathroom {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.42), transparent 54%),
+    linear-gradient(180deg, #ece9e0 0 68%, #d4c8b7 68% 100%);
 }
 
-.demo-room.kitchen {
-  background: linear-gradient(180deg, #e4dfd4 0 50%, #c4b8a8 50% 100%);
+.scene-backdrop.kitchen {
+  background:
+    linear-gradient(110deg, rgba(255,255,255,.32), transparent 46%),
+    linear-gradient(180deg, #e4dfd4 0 50%, #c4b8a8 50% 100%);
 }
 
-.back-wall {
-  inset: 0 0 auto;
-  height: var(--wall-end);
+.scene-objects {
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .window {
@@ -616,35 +623,81 @@ button {
   background: linear-gradient(180deg, #c9bba3, #9c8b70);
 }
 
-.wall-zone,
-.floor-zone {
+.surface-zone {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  mix-blend-mode: multiply;
+  overflow: hidden;
+}
+
+.surface-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.23) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(0,0,0,.12) 1px, transparent 1px);
+  background-size: inherit;
+  opacity: .72;
+  mix-blend-mode: overlay;
+}
+
+.surface-zone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.28), transparent 28%, rgba(0,0,0,.18) 100%),
+    radial-gradient(circle at 22% 12%, rgba(255,255,255,.32), transparent 24%);
+  mix-blend-mode: soft-light;
+  opacity: .78;
 }
 
 .wall-zone {
   clip-path: polygon(0 0, 100% 0, 100% var(--wall-end), 0 var(--wall-end));
-  opacity: calc(var(--surface-opacity) * .72);
+  opacity: calc(var(--surface-opacity) * .78);
   z-index: 2;
+  box-shadow: inset 0 -18px 24px rgba(0, 0, 0, .12);
+  mix-blend-mode: multiply;
 }
 
 .floor-zone {
   clip-path: polygon(0 var(--floor-left), 100% var(--floor-right), 100% 100%, 0 100%);
   opacity: var(--surface-opacity);
-  transform: perspective(900px) rotateX(49deg) scaleY(1.64);
-  transform-origin: 50% 100%;
   z-index: 3;
-}
-
-.uploaded .floor-zone {
-  transform: none;
+  box-shadow: inset 0 26px 36px rgba(0, 0, 0, .22);
+  mix-blend-mode: multiply;
 }
 
 .compare-zone {
   opacity: calc(var(--surface-opacity) * .98);
   z-index: 4;
+}
+
+.surface-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 13;
+  opacity: .22;
+}
+
+.wall-guide {
+  left: 0;
+  right: 0;
+  top: var(--wall-end);
+  height: 1px;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,.45);
+}
+
+.floor-guide {
+  inset: 0;
+  clip-path: polygon(0 var(--floor-left), 100% var(--floor-right), 100% 100%, 0 100%);
+  border-top: 1px solid rgba(255, 255, 255, .78);
+  background:
+    linear-gradient(110deg, transparent 0 48%, rgba(255,255,255,.3) 49% 50%, transparent 51% 100%),
+    linear-gradient(70deg, transparent 0 48%, rgba(255,255,255,.18) 49% 50%, transparent 51% 100%);
+  background-size: 80px 80px;
 }
 
 .split-line {

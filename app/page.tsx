@@ -395,18 +395,18 @@ export default function Home() {
                 ...(roomImage ? { backgroundImage: `url(${roomImage})` } : {}),
               }}
             >
-              {!roomImage && <DemoScene scene={scene} />}
+              {!roomImage && <SceneBackdrop scene={scene} />}
 
               {(surfaceMode === 'both' || surfaceMode === 'wall') && (
-                <div className="wall-zone" style={tileStyle(wallTile, tileScale)} />
+                <div className="surface-zone wall-zone" style={tileStyle(wallTile, tileScale)} />
               )}
               {(surfaceMode === 'both' || surfaceMode === 'floor') && (
-                <div className="floor-zone" style={tileStyle(floorTile, tileScale)} />
+                <div className="surface-zone floor-zone" style={tileStyle(floorTile, tileScale)} />
               )}
 
               {compareMode && compareSurface === 'floor' && (
                 <div
-                  className="floor-zone compare-zone"
+                  className="surface-zone floor-zone compare-zone"
                   style={{
                     ...tileStyle(selectedCompareTile, tileScale),
                     clipPath: `polygon(${split}% var(--floor-left), 100% var(--floor-right), 100% 100%, ${split}% 100%)`,
@@ -415,7 +415,7 @@ export default function Home() {
               )}
               {compareMode && compareSurface === 'wall' && (
                 <div
-                  className="wall-zone compare-zone"
+                  className="surface-zone wall-zone compare-zone"
                   style={{
                     ...tileStyle(selectedCompareTile, tileScale),
                     clipPath: `polygon(${split}% 0, 100% 0, 100% var(--wall-end), ${split}% var(--wall-end))`,
@@ -423,6 +423,9 @@ export default function Home() {
                 />
               )}
 
+              {!roomImage && <SceneObjects scene={scene} />}
+              <div className="surface-guide wall-guide" />
+              <div className="surface-guide floor-guide" />
               {compareMode && <div className="split-line" style={{ left: `${split}%` }} />}
 
               <div className="surface-tags">
@@ -596,10 +599,13 @@ export default function Home() {
   );
 }
 
-function DemoScene({ scene }: { scene: Scene }) {
+function SceneBackdrop({ scene }: { scene: Scene }) {
+  return <div className={`scene-backdrop ${scene}`} />;
+}
+
+function SceneObjects({ scene }: { scene: Scene }) {
   return (
-    <div className={`demo-room ${scene}`}>
-      <div className="back-wall" />
+    <div className={`scene-objects ${scene}`}>
       <div className="window" />
       <div className="art" />
       <div className="vanity" />
