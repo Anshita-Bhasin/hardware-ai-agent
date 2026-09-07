@@ -2,9 +2,21 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'RoomStyle Studio | AI Tile Visualizer Demo',
+  metadataBase: new URL('https://roomstyle-studio-demo.anshitabhasin.chatgpt.site'),
+  title: 'RoomStyle | AI Room Visualizer',
   description:
-    'A hardware, tile, and curtain retail demo with room upload, floor and wall visualizer, tile comparison, instant quote, and sales assistant.',
+    'Visualize floors and walls in your room, get AI product recommendations, compare options, and receive an instant project quote.',
+  openGraph: {
+    title: 'RoomStyle | AI Room Visualizer',
+    description: 'See the right surfaces in your room and move from inspiration to an exact quote.',
+    images: ['/room-luxury.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RoomStyle | AI Room Visualizer',
+    description: 'See the right surfaces in your room and move from inspiration to an exact quote.',
+    images: ['/room-luxury.png'],
+  },
 };
 
 export default function RootLayout({
