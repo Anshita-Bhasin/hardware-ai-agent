@@ -876,6 +876,46 @@ button {
   margin-bottom: 10px;
 }
 
+.capability-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.capability-grid button {
+  display: grid;
+  gap: 5px;
+  min-height: 92px;
+  border: 1px solid #dedede;
+  border-radius: 7px;
+  background: #fff;
+  padding: 10px;
+  color: #17191b;
+  text-align: left;
+}
+
+.capability-grid button.active {
+  border-color: #009aa6;
+  box-shadow: inset 0 0 0 1px #009aa6;
+}
+
+.capability-grid span {
+  color: #a2a7aa;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.capability-grid strong {
+  font-size: 12px;
+}
+
+.capability-grid small {
+  color: #0b838b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .chat-feed {
   display: grid;
   gap: 8px;

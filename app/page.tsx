@@ -1,133 +1,16 @@
 'use client';
 
 import { CSSProperties, ChangeEvent, FormEvent, useMemo, useState } from 'react';
+import { capabilities, createQuote, products, Product, Surface } from '@/lib/catalog';
 
-type Surface = 'floors' | 'walls';
 type ViewMode = 'list' | 'grid';
-
-type Product = {
-  id: string;
-  brand: string;
-  code: string;
-  title: string;
-  surface: Surface;
-  price: number;
-  size: string;
-  material: string;
-  finish: string;
-  color: string;
-  accent: string;
-  pattern: 'linear' | 'marble' | 'stone' | 'wood' | 'mosaic';
-  stock: number;
+type VisualizerApiResponse = {
+  quote: { total: number };
+  roomvo: { surfaces: unknown[] };
 };
-
-const products: Product[] = [
-  {
-    id: 'mar280',
-    brand: 'Marazzi',
-    code: 'MAR280',
-    title: 'Sage Relief Decor',
-    surface: 'walls',
-    price: 164.98,
-    size: '30X90CM',
-    material: 'Ceramic',
-    finish: 'Glossy',
-    color: '#557979',
-    accent: '#d9ebe7',
-    pattern: 'linear',
-    stock: 46,
-  },
-  {
-    id: 'bruae543',
-    brand: 'Rak Tiles',
-    code: 'BRUAE543',
-    title: 'Soft Ivory Stone',
-    surface: 'walls',
-    price: 50.01,
-    size: '60X60CM',
-    material: 'Porcelain',
-    finish: 'Matt',
-    color: '#d8d1c4',
-    accent: '#8d8578',
-    pattern: 'stone',
-    stock: 120,
-  },
-  {
-    id: 'rocf1q0b54011',
-    brand: 'Roca Tiles',
-    code: 'ROCF1Q0B54011',
-    title: 'Warm Concrete',
-    surface: 'walls',
-    price: 166,
-    size: '60X120CM',
-    material: 'Concrete',
-    finish: 'Silk',
-    color: '#cfcac0',
-    accent: '#77736d',
-    pattern: 'stone',
-    stock: 75,
-  },
-  {
-    id: 'bcwl710',
-    brand: 'Saloni',
-    code: 'BCWL710',
-    title: 'Fluted Marble Beige',
-    surface: 'walls',
-    price: 251,
-    size: '30X90CM',
-    material: 'Porcelain',
-    finish: 'Lappato',
-    color: '#dfd5c3',
-    accent: '#af9a78',
-    pattern: 'linear',
-    stock: 38,
-  },
-  {
-    id: 'betr670',
-    brand: 'Saloni',
-    code: 'BETR670',
-    title: 'Travertine Vein Cut',
-    surface: 'floors',
-    price: 106,
-    size: '60X120CM',
-    material: 'Porcelain',
-    finish: 'Matt',
-    color: '#b8ae9e',
-    accent: '#746b61',
-    pattern: 'stone',
-    stock: 90,
-  },
-  {
-    id: 'wood924',
-    brand: 'Marca Corona',
-    code: 'WOOD924',
-    title: 'Natural Oak Plank',
-    surface: 'floors',
-    price: 118,
-    size: '20X120CM',
-    material: 'Porcelain',
-    finish: 'Matt',
-    color: '#a37248',
-    accent: '#f1cc8e',
-    pattern: 'wood',
-    stock: 64,
-  },
-  {
-    id: 'cal120',
-    brand: 'Roca Tiles',
-    code: 'CAL120',
-    title: 'Calacatta Super White',
-    surface: 'floors',
-    price: 142,
-    size: '120X120CM',
-    material: 'Porcelain',
-    finish: 'Polished',
-    color: '#f3efe7',
-    accent: '#a89f92',
-    pattern: 'marble',
-    stock: 52,
-  },
-];
+type AssistantApiResponse = {
+  reply: string;
+};
 
 const menuItems = [
   'Tiles & Slab',
@@ -221,6 +104,7 @@ export default function Home() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(true);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [agentMode, setAgentMode] = useState('concept');
   const [compareMode, setCompareMode] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [split, setSplit] = useState(50);
@@ -246,19 +130,8 @@ export default function Home() {
   const visibleProducts = products.filter((product) => product.surface === selectedSurface);
 
   const quote = useMemo(() => {
-    const factor = 1 + wastage / 100;
-    const floorCost = area * floorProduct.price * factor;
-    const wallCost = area * 0.42 * wallProduct.price * factor;
-    const installation = area * 14;
-    const adhesive = area * 5.5;
-    return {
-      floorCost: Math.round(floorCost),
-      wallCost: Math.round(wallCost),
-      installation: Math.round(installation),
-      adhesive: Math.round(adhesive),
-      total: Math.round(floorCost + wallCost + installation + adhesive),
-    };
-  }, [area, floorProduct.price, wallProduct.price, wastage]);
+    return createQuote({ area, wastage, floorProductId, wallProductId });
+  }, [area, floorProductId, wallProductId, wastage]);
 
   function selectProduct(product: Product) {
     setSelectedProductId(product.id);
@@ -300,30 +173,55 @@ export default function Home() {
     ]);
   }
 
-  function handleChat(event: FormEvent<HTMLFormElement>) {
+  async function refreshVisualizer() {
+    const response = await fetch('/api/visualizer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        area,
+        wastage,
+        floorProductId,
+        wallProductId,
+        selectedProductId,
+        compareProductId,
+      }),
+    });
+    const result = (await response.json()) as VisualizerApiResponse;
+    setMessages((current) => [
+      ...current,
+      {
+        role: 'assistant',
+        text: `Visualizer payload prepared for ${result.roomvo.surfaces.length} surfaces. BOQ total is QAR ${result.quote.total.toLocaleString()}.`,
+      },
+    ]);
+  }
+
+  async function handleChat(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = chatInput.trim();
     if (!text) return;
 
-    const lower = text.toLowerCase();
-    let answer = `Current estimate: QAR ${quote.total.toLocaleString()} for ${area.toLocaleString()} sq ft using ${floorProduct.code} on floors and ${wallProduct.code} on walls.`;
-
-    if (lower.includes('stock')) {
-      answer = `${selectedProduct.code} has ${selectedProduct.stock} units in demo stock. In production this will read live inventory from the website or ERP.`;
-    } else if (lower.includes('finish') || lower.includes('slip')) {
-      answer = `${selectedProduct.title} is ${selectedProduct.finish}. For wet areas, the assistant should recommend Matt / anti-slip floor products only.`;
-    } else if (lower.includes('quantity') || lower.includes('wastage')) {
-      answer = `For ${area.toLocaleString()} sq ft, the quote includes ${wastage}% wastage. The formula can change by product size, diagonal layout, and installer rules.`;
-    } else if (lower.includes('share') || lower.includes('whatsapp')) {
-      answer = 'The final build can generate a shareable visualizer link, PDF quote, and WhatsApp message with product codes, quantity, and total.';
-    }
-
     setMessages((current) => [
       ...current,
       { role: 'user', text },
-      { role: 'assistant', text: answer },
     ]);
     setChatInput('');
+
+    const response = await fetch('/api/assistant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        area,
+        wastage,
+        floorProductId,
+        wallProductId,
+        selectedProductId,
+        compareProductId,
+        prompt: text,
+      }),
+    });
+    const result = (await response.json()) as AssistantApiResponse;
+    setMessages((current) => [...current, { role: 'assistant', text: result.reply }]);
   }
 
   const visualizerStyle = {
@@ -485,6 +383,7 @@ export default function Home() {
               <input value={wastage} min={0} max={20} type="number" onChange={(event) => setWastage(Number(event.target.value) || 0)} />
             </label>
             <button type="button" onClick={() => setQuoteOpen((value) => !value)}>Quotation</button>
+            <button type="button" onClick={refreshVisualizer}>Sync Roomvo</button>
             <button type="button" onClick={() => setAssistantOpen((value) => !value)}>Assistant</button>
           </div>
 
@@ -526,6 +425,7 @@ export default function Home() {
             <div><dt>Floor material</dt><dd>QAR {quote.floorCost.toLocaleString()}</dd></div>
             <div><dt>Wall material</dt><dd>QAR {quote.wallCost.toLocaleString()}</dd></div>
             <div><dt>Adhesive / grout</dt><dd>QAR {quote.adhesive.toLocaleString()}</dd></div>
+            <div><dt>Cartons</dt><dd>{quote.cartons.floors} floor / {quote.cartons.walls} wall</dd></div>
             <div><dt>Installation</dt><dd>QAR {quote.installation.toLocaleString()}</dd></div>
           </dl>
           <div className="quote-total">
@@ -548,8 +448,25 @@ export default function Home() {
             <button type="button" onClick={() => setAssistantOpen(false)}>×</button>
           </div>
           <div className="quick-prompts">
-            {['Check stock', 'Recommend finish', 'Calculate quantity', 'Share on WhatsApp'].map((prompt) => (
+            {['Check stock', 'Recommend finish', 'Smart BOQ', 'Compare options', 'Share on WhatsApp'].map((prompt) => (
               <button key={prompt} type="button" onClick={() => setChatInput(prompt)}>{prompt}</button>
+            ))}
+          </div>
+          <div className="capability-grid">
+            {capabilities.map((capability, index) => (
+              <button
+                className={agentMode === capability.id ? 'active' : ''}
+                key={capability.id}
+                type="button"
+                onClick={() => {
+                  setAgentMode(capability.id);
+                  setChatInput(capability.title);
+                }}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{capability.title}</strong>
+                <small>{capability.signal}</small>
+              </button>
             ))}
           </div>
           <div className="chat-feed">
