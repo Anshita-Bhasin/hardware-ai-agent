@@ -68,7 +68,7 @@ export default function Home() {
   const [leadOpen, setLeadOpen] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [split, setSplit] = useState(50);
-  const [roomImage, setRoomImage] = useState('/room-luxury.png');
+  const [roomImage, setRoomImage] = useState('/room-luxury-tiled.png');
   const [area, setArea] = useState(42);
   const [wastage, setWastage] = useState(8);
   const [chatInput, setChatInput] = useState('');
@@ -207,14 +207,14 @@ export default function Home() {
         <div className="viewer">
           <div className="room-stage" style={roomStyle}>
             <div className="room-photo" style={{ backgroundImage: `url(${roomImage})` }} />
-            <div className="wall-surface" style={productTexture(wallProduct, 86)} />
-            <div className="floor-surface" style={productTexture(floorProduct, 112)} />
-            {compareMode && <div className={`compare-surface ${selectedSurface}`} style={productTexture(compareProduct, selectedSurface === 'floors' ? 112 : 86)} />}
+            {wallProductId !== 'bruae543' && <div className="wall-surface"><div className="surface-pattern" style={productTexture(wallProduct, 78)} /></div>}
+            {floorProductId !== 'betr670' && <div className="floor-surface"><div className="surface-pattern" style={productTexture(floorProduct, floorProduct.pattern === 'wood' ? 62 : 104)} /></div>}
+            {compareMode && <div className={`compare-surface ${selectedSurface}`}><div className="surface-pattern" style={productTexture(compareProduct, compareProduct.pattern === 'wood' ? 62 : 96)} /></div>}
             {compareMode && <div className="compare-divider" style={{ left: `${split}%` }}><ArrowLeftRight size={15} /></div>}
             {compareMode && <input className="compare-slider" aria-label="Comparison split" type="range" min={25} max={75} value={split} onChange={(event) => setSplit(Number(event.target.value))} />}
             <div className="scene-status"><span><WandSparkles size={15} /> AI surfaces mapped</span><strong>Living + dining room</strong></div>
-            <button className="surface-pin wall-pin" type="button" onClick={() => setSelectedSurface('walls')}><span style={productTexture(wallProduct, 20)} />Walls <Check size={13} /></button>
-            <button className="surface-pin floor-pin" type="button" onClick={() => setSelectedSurface('floors')}><span style={productTexture(floorProduct, 20)} />Floors <Check size={13} /></button>
+            <button className="surface-pin wall-pin" type="button" onClick={() => setSelectedSurface('walls')}><span style={productTexture(wallProduct, 20)} />Wall · {wallProduct.code} <Check size={13} /></button>
+            <button className="surface-pin floor-pin" type="button" onClick={() => setSelectedSurface('floors')}><span style={productTexture(floorProduct, 20)} />Floor · {floorProduct.code} <Check size={13} /></button>
             <div className="stage-controls"><button className="icon-button" type="button" aria-label="Zoom out" onClick={() => setZoom((value) => Math.max(85, value - 5))}>−</button><span>{zoom}%</span><button className="icon-button" type="button" aria-label="Zoom in" onClick={() => setZoom((value) => Math.min(125, value + 5))}>+</button></div>
           </div>
         </div>

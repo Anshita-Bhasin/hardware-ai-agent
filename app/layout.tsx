@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'RoomStyle | AI Room Visualizer',
     description: 'See the right surfaces in your room and move from inspiration to an exact quote.',
-    images: ['/room-luxury.png'],
+    images: ['/room-luxury-tiled.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RoomStyle | AI Room Visualizer',
     description: 'See the right surfaces in your room and move from inspiration to an exact quote.',
-    images: ['/room-luxury.png'],
+    images: ['/room-luxury-tiled.png'],
   },
 };
 
