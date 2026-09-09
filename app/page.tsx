@@ -153,6 +153,7 @@ export default function Home() {
   }
 
   const roomStyle = { '--room-zoom': zoom / 100, '--compare-split': `${split}%` } as CSSProperties;
+  const hasMappedForeground = roomImage === '/room-luxury-tiled.png';
 
   return (
     <main className={`visualizer-shell ${assistantOpen ? 'assistant-active' : ''}`}>
@@ -210,6 +211,7 @@ export default function Home() {
             {wallProductId !== 'bruae543' && <div className="wall-surface"><div className="surface-pattern" style={productTexture(wallProduct, 78)} /></div>}
             {floorProductId !== 'betr670' && <div className="floor-surface"><div className="surface-pattern" style={productTexture(floorProduct, floorProduct.pattern === 'wood' ? 62 : 104)} /></div>}
             {compareMode && <div className={`compare-surface ${selectedSurface}`}><div className="surface-pattern" style={productTexture(compareProduct, compareProduct.pattern === 'wood' ? 62 : 96)} /></div>}
+            {hasMappedForeground && <div className="room-foreground" aria-hidden="true" />}
             {compareMode && <div className="compare-divider" style={{ left: `${split}%` }}><ArrowLeftRight size={15} /></div>}
             {compareMode && <input className="compare-slider" aria-label="Comparison split" type="range" min={25} max={75} value={split} onChange={(event) => setSplit(Number(event.target.value))} />}
             <div className="scene-status"><span><WandSparkles size={15} /> AI surfaces mapped</span><strong>Living + dining room</strong></div>
