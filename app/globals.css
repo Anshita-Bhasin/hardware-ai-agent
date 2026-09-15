@@ -254,8 +254,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, label[for]:focu
   .topbar-actions button:nth-child(1), .topbar-actions button:nth-child(5) { display: none; }
   .quote-button { padding: 0 10px; }
   .assistant-toggle { width: 40px; padding: 0; }
-  .viewer { padding: 8px; }
-  .room-stage { min-height: 390px; }
+  .viewer { padding: 8px; align-items: start; }
   .room-photo { background-position: 18% center; }
   .scene-status { top: 9px; left: 9px; }
   .wall-pin { top: 31%; right: 10%; }

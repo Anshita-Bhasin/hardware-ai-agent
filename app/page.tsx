@@ -99,6 +99,7 @@ export default function Home() {
     setSelectedProductId(product.id);
     if (product.surface === 'floors') setFloorProductId(product.id);
     else setWallProductId(product.id);
+    if (window.matchMedia('(max-width: 900px)').matches) setCatalogOpen(false);
   }
 
   function toggleFavorite(productId: string) {
